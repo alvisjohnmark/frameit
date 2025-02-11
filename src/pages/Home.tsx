@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import Webcam from "react-webcam";
-import html2canvas from "html2canvas";
 
 const Home = () => {
   const webcamRef = useRef<Webcam>(null);
@@ -49,93 +48,118 @@ const Home = () => {
   };
 
   const downloadImages = () => {
-    const container = document.createElement("div");
-    container.style.display = "flex";
-    container.style.flexDirection = "column";
-    container.style.alignItems = "center";
-    container.style.gap = "15px"; // Better spacing
-    container.style.padding = "20px";
-    container.style.backgroundColor = "white";
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const canvasWidth = 600;
+    const canvasHeight = 800;
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
 
-    images.forEach((src) => {
-      const img = document.createElement("img");
-      if (src) img.src = src;
-      img.style.width = "400px"; // Adjusted size
-      img.style.height = "400px"; // Perfect square
-      img.style.borderRadius = "15px"; // Smooth edges
-      img.style.boxShadow = "0px 4px 10px rgba(0, 0, 0, 0.2)";
-      img.style.objectFit = "cover"; // Ensures full image display
-      container.appendChild(img);
-    });
+    // Background Color
+    if (ctx) {
+      ctx.fillStyle = "#f8f5e6";
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-    // Watermark
-    const watermark = document.createElement("div");
-    watermark.innerText = "FrameIt";
-    watermark.style.position = "absolute";
-    watermark.style.bottom = "10px";
-    watermark.style.left = "10px";
-    watermark.style.color = "rgba(0, 0, 0, 0.7)";
-    watermark.style.fontSize = "18px";
-    watermark.style.fontWeight = "bold";
-    watermark.style.fontFamily = "Arial, sans-serif";
-    container.appendChild(watermark);
+      // Load Images
+      const imgElements = images.map((src) => {
+        const img = new Image();
+        if (src) {
+          img.src = src;
+        }
+        return img;
+      });
 
-    document.body.appendChild(container);
+      Promise.all(
+        imgElements.map(
+          (img) =>
+            new Promise((resolve) => {
+              img.onload = resolve;
+            })
+        )
+      ).then(() => {
+       
+        const imgWidth = 300; 
+        const imgHeight = 200; 
 
-    html2canvas(container).then((canvas) => {
-      const link = document.createElement("a");
-      link.href = canvas.toDataURL("image/png");
-      link.download = "frameit.png";
-      link.click();
-      document.body.removeChild(container);
-    });
+       
+        const xOffset = (canvasWidth - imgWidth) / 2;
+
+        imgElements.forEach((img, i) => {
+          const yOffset = 50 + i * (imgHeight + 20); 
+          ctx.drawImage(img, xOffset, yOffset, imgWidth, imgHeight); 
+        });
+
+        // Add text at the bottom
+        ctx.fillStyle = "#a39fd1";
+        ctx.font = "bold 40px cursive";
+        ctx.textAlign = "center";
+        ctx.fillText("FrameIt", canvasWidth / 2, canvasHeight - 50);
+
+        // Convert to image and download
+        const link = document.createElement("a");
+        link.download = "FrameIt_Collage.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    }
   };
-
   return (
-    <section className="bg-[#ede8d0] min-h-screen flex flex-col items-center justify-center gap-6 p-5">
-      <h1 className="text-3xl font-bold italic">FrameIt</h1>
-      <div className="flex">
-        <div className="flex flex-col items-center">
-          <div className="border-4 border-gray-700 rounded-md overflow-hidden">
+    <section className="bg-gradient-to-br from-[#f8f5e6] to-[#fff] min-h-screen flex flex-col items-center justify-center gap-8 p-5">
+      <h1 className="text-4xl font-bold text-[#ffb3ba] font-[cursive] tracking-wide">
+        FrameIt
+      </h1>
+      <div className="flex gap-8 p-8 rounded-3xl backdrop-blur-sm">
+        <div className="flex flex-col items-center gap-6">
+          <div className="border-8 border-[#a8d8ea] rounded-xl overflow-hidden">
             <Webcam
               ref={webcamRef}
               screenshotFormat="image/png"
               mirrored={true}
+              className="object-cover"
             />
           </div>
           {countdown !== null && (
-            <p className="text-3xl mt-2 font-bold">{countdown}</p>
+            <p className="text-4xl mt-2 font-bold text-[#a39fd1] animate-pulse">
+              {countdown}
+            </p>
           )}
           <button
-            className="mt-4 bg-green-600 text-white px-6 py-3 text-lg rounded-lg shadow-lg"
+            className="mt-2 bg-[#a8e6cf] text-[#556b6d] px-8 py-4 text-xl rounded-md shadow-lg cursor-pointer font-semibold"
             onClick={startCaptureSequence}
             disabled={countdown !== null}
           >
-            {countdown !== null ? "Capturing..." : "Capture"}
+            {countdown !== null ? "Capturing..." : "Capture Moment"}
           </button>
         </div>
-        <div className="flex flex-col items-center gap-4">
-          <div className="grid grid-cols-1 gap-4">
-            {images.map((src, index) => (
-              <img
-                key={index}
-                src={src || ""}
-                alt={`Captured ${index}`}
-                className="w-45 h-35  border-2 border-gray-700 rounded-lg shadow-md"
-              />
-            ))}
+        <div className="flex flex-col items-center gap-6">
+          <h1 className="text-lg font-semibold text-[#556b6d]">Preview</h1>
+          <div className="grid grid-cols-1 gap-6 p-4 rounded-2xl min-h-40 w-56 items-center justify-center ">
+            {images.length > 0 ? (
+              images.map((src, index) => (
+                <img
+                  key={index}
+                  src={src || undefined}
+                  alt={`Captured ${index}`}
+                  className="w-48 h-36 border-4 border-[#ffb3ba] rounded-xl shadow-md hover:scale-102 transition-transform duration-200 object-cover"
+                />
+              ))
+            ) : (
+              <p className="text-[#a39fd1] text-lg text-center font-semibold">
+                No Images Yet
+              </p>
+            )}
           </div>
-          <div className="flex ">
+          <div className="flex flex-col items-center gap-4">
             {images.length === 3 && (
-              <div className="flex gap-3">
+              <div className="flex gap-4">
                 <button
-                  className="bg-black text-white px-4 py-2 rounded-lg shadow-lg"
+                  className="bg-[#a39fd1] hover:bg-[#8f8bbd] text-white px-6 py-3 rounded-full shadow-lg cursor-pointer font-medium"
                   onClick={downloadImages}
                 >
                   Download Collage
                 </button>
                 <button
-                  className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg"
+                  className="bg-[#ff8b94] hover:bg-[#ff7984] text-white px-6 py-3 rounded-full shadow-lg cursor-pointer font-medium"
                   onClick={resetImages}
                 >
                   Reset
