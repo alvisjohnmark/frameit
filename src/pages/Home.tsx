@@ -48,7 +48,7 @@ const Home = () => {
     setCountdown(null);
   };
 
-  const downloadImages = (layout: any) => {
+  const downloadImages = () => {
     const container = document.createElement("div");
     container.style.display = "flex";
     container.style.flexDirection = "column";
@@ -107,7 +107,7 @@ const Home = () => {
             <div className="flex gap-3">
               <button
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg"
-                onClick={() => downloadImages("column")}
+                onClick={downloadImages}
               >
                 Download Collage
               </button>
