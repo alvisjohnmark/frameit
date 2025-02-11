@@ -53,21 +53,39 @@ const Home = () => {
     container.style.display = "flex";
     container.style.flexDirection = "column";
     container.style.alignItems = "center";
-    container.style.gap = "10px";
+    container.style.gap = "15px"; // Better spacing
+    container.style.padding = "20px";
+    container.style.backgroundColor = "white";
+
     images.forEach((src) => {
       const img = document.createElement("img");
-      if (src) {
-        img.src = src;
-      }
-      img.style.width = "300px";
-      img.style.height = "450px";
+      if (src) img.src = src;
+      img.style.width = "400px"; // Adjusted size
+      img.style.height = "400px"; // Perfect square
+      img.style.borderRadius = "15px"; // Smooth edges
+      img.style.boxShadow = "0px 4px 10px rgba(0, 0, 0, 0.2)";
+      img.style.objectFit = "cover"; // Ensures full image display
       container.appendChild(img);
     });
+
+    // Watermark
+    const watermark = document.createElement("div");
+    watermark.innerText = "FrameIt";
+    watermark.style.position = "absolute";
+    watermark.style.bottom = "10px";
+    watermark.style.left = "10px";
+    watermark.style.color = "rgba(0, 0, 0, 0.7)";
+    watermark.style.fontSize = "18px";
+    watermark.style.fontWeight = "bold";
+    watermark.style.fontFamily = "Arial, sans-serif";
+    container.appendChild(watermark);
+
     document.body.appendChild(container);
+
     html2canvas(container).then((canvas) => {
       const link = document.createElement("a");
       link.href = canvas.toDataURL("image/png");
-      link.download = "collage.png";
+      link.download = "frameit.png";
       link.click();
       document.body.removeChild(container);
     });
@@ -79,7 +97,11 @@ const Home = () => {
       <div className="flex">
         <div className="flex flex-col items-center">
           <div className="border-4 border-gray-700 rounded-md overflow-hidden">
-            <Webcam ref={webcamRef} screenshotFormat="image/png" />
+            <Webcam
+              ref={webcamRef}
+              screenshotFormat="image/png"
+              mirrored={false}
+            />
           </div>
           {countdown !== null && (
             <p className="text-3xl mt-2 font-bold">{countdown}</p>
