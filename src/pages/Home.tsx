@@ -125,22 +125,24 @@ const Home = () => {
               />
             ))}
           </div>
-          {images.length === 3 && (
-            <div className="flex gap-3">
-              <button
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg"
-                onClick={downloadImages}
-              >
-                Download Collage
-              </button>
-              <button
-                className="bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg"
-                onClick={resetImages}
-              >
-                Reset
-              </button>
-            </div>
-          )}
+          <div className="flex ">
+            {images.length === 3 && (
+              <div className="flex gap-3">
+                <button
+                  className="bg-black text-white px-4 py-2 rounded-lg shadow-lg"
+                  onClick={downloadImages}
+                >
+                  Download Collage
+                </button>
+                <button
+                  className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg"
+                  onClick={resetImages}
+                >
+                  Reset
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </section>
