@@ -100,7 +100,7 @@ const Home = () => {
             <Webcam
               ref={webcamRef}
               screenshotFormat="image/png"
-              mirrored={false}
+              mirrored={true}
             />
           </div>
           {countdown !== null && (
